@@ -1,0 +1,33 @@
+# CI: собирает неподписанный .ipa на macOS-раннере GitHub
+name: build-ipa
+on:
+  push:
+    branches: [ main ]
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build unsigned .ipa
+        run: bash Scripts/build-ipa.sh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AttackVPN-unsigned-ipa
+          path: build/AttackVPN.ipa
+      # на тег vX.Y.Z — кладём .ipa в релиз
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/AttackVPN.ipa

@@ -6,20 +6,20 @@ enum ConnectionState: Equatable {
     case connected
     case disconnecting
 
-    var title: String {
-        switch self {
-        case .disconnected: return "Not protected"
-        case .connecting: return "Establishing tunnel"
-        case .connected: return "Protected"
-        case .disconnecting: return "Closing tunnel"
-        }
-    }
-
     var isBusy: Bool {
         self == .connecting || self == .disconnecting
     }
 
     var isOn: Bool {
         self == .connected
+    }
+
+    var statusLabel: String {
+        switch self {
+        case .disconnected: return "Not connected"
+        case .connecting: return "Connecting…"
+        case .connected: return "Protected"
+        case .disconnecting: return "Disconnecting…"
+        }
     }
 }

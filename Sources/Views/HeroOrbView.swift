@@ -3,18 +3,29 @@ import SwiftUI
 struct HeroOrbView: View {
     @EnvironmentObject private var vpn: VpnController
     let size: CGFloat
+
+    @AppStorage("useLiquidGlass") private var useGlass = true
     @State private var progress: CGFloat = 0
 
     var body: some View {
         ZStack {
             Circle().stroke(Palette.track, lineWidth: 3)
             ringLayer
-            Circle().fill(Palette.card).padding(26)
+            coreFill.padding(26)
             core
         }
         .frame(width: size, height: size)
         .onChange(of: vpn.state) { _, s in update(s) }
         .onAppear { update(vpn.state) }
+    }
+
+    @ViewBuilder
+    private var coreFill: some View {
+        if useGlass, #available(iOS 26.0, *) {
+            Circle().fill(.clear).glassEffect(.regular, in: Circle())
+        } else {
+            Circle().fill(Palette.card)
+        }
     }
 
     @ViewBuilder
@@ -37,11 +48,16 @@ struct HeroOrbView: View {
                     .font(.system(size: 26, weight: .heavy))
                     .foregroundStyle(Palette.text)
             } else {
-                Text(vpn.state == .connecting ? "Connecting…" : "Tap to connect")
+                Text(label)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Palette.muted)
             }
         }
+    }
+
+    private var label: String {
+        if !vpn.hasConfig { return "Add a key" }
+        return vpn.state == .connecting ? "Connecting…" : "Tap to connect"
     }
 
     private func update(_ s: ConnectionState) {

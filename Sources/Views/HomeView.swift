@@ -3,27 +3,26 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject private var vpn: VpnController
     @Environment(\.horizontalSizeClass) private var sizeClass
-    @State private var showPaste = false
+    @State private var showConfig = false
+    @State private var showSettings = false
     @State private var toast: String?
 
     private var orbSize: CGFloat { sizeClass == .regular ? 320 : 230 }
 
     var body: some View {
         VStack(spacing: 16) {
-            TopBar()
-            Text(vpn.state.statusLabel)
+            TopBar { showSettings = true }
+            Text(vpn.hasConfig ? vpn.state.statusLabel : "No configuration")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(vpn.state.isOn ? Palette.text : Palette.muted)
                 .padding(.top, 6)
             HeroOrbView(size: orbSize)
                 .contentShape(Circle())
-                .onTapGesture { vpn.toggle() }
+                .onTapGesture { heroTap() }
             StatsRow()
             IpCard(showToast: { toast = $0 })
-            ConfigCard { showPaste = true }
+            ConfigCard { showConfig = true }
             Spacer(minLength: 8)
-            Button(vpn.state.isOn ? "Disconnect" : "Connect") { vpn.toggle() }
-                .buttonStyle(WhiteButtonStyle())
         }
         .padding(.horizontal, 20)
         .padding(.top, 12)
@@ -37,10 +36,15 @@ struct HomeView: View {
             guard v != nil else { return }
             Task { try? await Task.sleep(nanoseconds: 1_500_000_000); toast = nil }
         }
-        .sheet(isPresented: $showPaste) { PasteSheet() }
+        .sheet(isPresented: $showConfig) { ConfigSheet() }
+        .sheet(isPresented: $showSettings) { SettingsSheet() }
         .overlay(alignment: .bottom) {
-            if let toast { ToastView(text: toast).padding(.bottom, 96) }
+            if let toast { ToastView(text: toast).padding(.bottom, 40) }
         }
         .animation(.easeInOut(duration: 0.25), value: toast)
+    }
+
+    private func heroTap() {
+        if vpn.hasConfig { vpn.toggle() } else { showConfig = true }
     }
 }

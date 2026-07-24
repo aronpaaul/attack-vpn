@@ -1,9 +1,9 @@
 import SwiftUI
 
 extension View {
-    func cardStyle(padding: CGFloat = 16) -> some View {
+    func cardStyle(padding: CGFloat = 16, radius: CGFloat = 20) -> some View {
         self
             .padding(padding)
-            .background(Palette.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .modifier(GlassCard(cornerRadius: radius))
     }
 }

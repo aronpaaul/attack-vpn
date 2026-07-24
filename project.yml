@@ -10,7 +10,7 @@ settings:
   base:
     # Swift 5 режим, чтобы strict concurrency Swift 6 не ломал сборку
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.1.0"
+    MARKETING_VERSION: "0.3.0"
     CURRENT_PROJECT_VERSION: "1"
     # 1 = iPhone, 2 = iPad — приложение универсальное
     TARGETED_DEVICE_FAMILY: "1,2"
@@ -32,8 +32,8 @@ targets:
         # без подписи — .ipa подписывается отдельно вручную
         CODE_SIGNING_ALLOWED: "NO"
         CODE_SIGN_IDENTITY: ""
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
-        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait"
 # общая схема — нужна для сборки через xcodebuild -scheme в CI
 schemes:
   AttackVPN:

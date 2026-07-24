@@ -40,7 +40,7 @@ struct SettingsSheet: View {
                         .cardStyle()
                     }
 
-                    Text("Attack VPN · 0.3.0\nVLESS over sing-box · UI preview")
+                    Text("Attack VPN · 0.3.1\nVLESS over sing-box · UI preview")
                         .font(.system(size: 12))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(Palette.muted)

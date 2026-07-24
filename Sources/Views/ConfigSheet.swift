@@ -6,7 +6,7 @@ struct ConfigSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var text = ""
-    @State private var invalid = false
+    @State private var toast: ToastMessage?
     @State private var showQR = false
     @State private var showShare = false
 
@@ -31,16 +31,11 @@ struct ConfigSheet: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    if invalid {
-                        Text("Not a valid vless:// key")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(Color(red: 1, green: 0.42, blue: 0.45))
-                    }
                     PrimaryButton(title: vpn.hasConfig ? "Replace key" : "Import key") { save() }
                     if vpn.hasConfig {
                         ConfigActions(onQR: { showQR = true },
                                       onExport: { showShare = true },
-                                      onRemove: { vpn.removeConfig(); dismiss() })
+                                      onRemove: removeConfig)
                     }
                 }
                 .padding(20)
@@ -52,6 +47,7 @@ struct ConfigSheet: View {
             .navigationTitle("Configuration")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .toast($toast)
         }
         .onAppear { text = vpn.config?.raw ?? "" }
         .sheet(isPresented: $showQR) { QRSheet(text: vpn.config?.raw ?? "") }
@@ -59,7 +55,18 @@ struct ConfigSheet: View {
     }
 
     private func save() {
-        if vpn.importKey(text) { HapticsEngine.shared.tick(); dismiss() }
-        else { withAnimation { invalid = true } }
+        if vpn.importKey(text) {
+            HapticsEngine.shared.connected()
+            toast = ToastMessage(text: "Key imported", kind: .success)
+            Task { try? await Task.sleep(nanoseconds: 850_000_000); dismiss() }
+        } else {
+            HapticsEngine.shared.tick()
+            toast = ToastMessage(text: "Invalid vless:// key", kind: .error)
+        }
+    }
+
+    private func removeConfig() {
+        vpn.removeConfig()
+        dismiss()
     }
 }

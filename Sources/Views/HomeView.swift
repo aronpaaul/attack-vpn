@@ -5,7 +5,7 @@ struct HomeView: View {
     @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var showConfig = false
     @State private var showSettings = false
-    @State private var toast: String?
+    @State private var toast: ToastMessage?
 
     private var orbSize: CGFloat { sizeClass == .regular ? 320 : 230 }
 
@@ -20,7 +20,7 @@ struct HomeView: View {
                 .contentShape(Circle())
                 .onTapGesture { heroTap() }
             StatsRow()
-            IpCard(showToast: { toast = $0 })
+            IpCard(report: { toast = $0 })
             ConfigCard { showConfig = true }
             Spacer(minLength: 8)
         }
@@ -32,16 +32,9 @@ struct HomeView: View {
             if s == .connected { HapticsEngine.shared.connected() }
             else if s == .connecting || s == .disconnecting { HapticsEngine.shared.tick() }
         }
-        .onChange(of: toast) { _, v in
-            guard v != nil else { return }
-            Task { try? await Task.sleep(nanoseconds: 1_500_000_000); toast = nil }
-        }
         .sheet(isPresented: $showConfig) { ConfigSheet() }
         .sheet(isPresented: $showSettings) { SettingsSheet() }
-        .overlay(alignment: .bottom) {
-            if let toast { ToastView(text: toast).padding(.bottom, 40) }
-        }
-        .animation(.easeInOut(duration: 0.25), value: toast)
+        .toast($toast)
     }
 
     private func heroTap() {

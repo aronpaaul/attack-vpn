@@ -3,7 +3,7 @@ import UIKit
 
 struct IpCard: View {
     @EnvironmentObject private var vpn: VpnController
-    var showToast: (String) -> Void
+    var report: (ToastMessage) -> Void
 
     @AppStorage("showFullIp") private var showFullIp = false
     @State private var revealed = false
@@ -65,6 +65,6 @@ struct IpCard: View {
         withAnimation { revealed = true }
         UIPasteboard.general.string = ip
         HapticsEngine.shared.tick()
-        showToast("IP copied · \(ip)")
+        report(ToastMessage(text: "IP copied · \(ip)", kind: .success))
     }
 }

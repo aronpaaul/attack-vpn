@@ -10,7 +10,7 @@ settings:
   base:
     # Swift 5 режим, чтобы strict concurrency Swift 6 не ломал сборку
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.3.1"
+    MARKETING_VERSION: "0.3.2"
     CURRENT_PROJECT_VERSION: "1"
     # 1 = iPhone, 2 = iPad — приложение универсальное
     TARGETED_DEVICE_FAMILY: "1,2"
